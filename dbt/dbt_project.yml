@@ -1,0 +1,22 @@
+name: 'f1_project'                   # << guion bajo, no guion medio (dbt no permite "-")
+version: '1.0.0'
+config-version: 2
+
+profile: 'f1_project'                # << debe ser IGUAL a la clave que uses en profiles.yml
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  f1_project:                        # << mismo nombre que "name:" arriba
+    staging:
+      +materialized: view            # transformaciones ligeras bronze -> silver
+    marts:
+      +materialized: table           # tablas finales para análisis/reportes

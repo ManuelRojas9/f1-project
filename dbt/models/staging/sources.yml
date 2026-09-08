@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: bronze
+    database: f1                       # el catálogo
+    schema: bronze                     # el schema de origen
+    tables:
+      - name: constructors
+      - name: drivers
+      - name: laps
+      - name: races
+      - name: results
+      - name: seasons
+      - name: sprint

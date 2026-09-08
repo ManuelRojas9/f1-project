@@ -1,0 +1,31 @@
+# --- dbt ---
+dbt/profiles.yml
+target/
+dbt_packages/
+logs/
+.user.yml
+
+# --- credenciales / secretos ---
+.env
+*.pem
+*.key
+credentials.json
+token.txt
+
+# --- Databricks ---
+.databrickscfg
+
+# --- Python (si tu ETL o dbt corre en un venv) ---
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# --- Docker ---
+*.log
+
+# --- Sistema operativo / editor ---
+.DS_Store
+.vscode/
+.idea/
