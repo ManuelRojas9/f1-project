@@ -4,12 +4,12 @@ SELECT
     raceName as race_name,
     CAST(date AS date),
     CAST(time AS timestamp),
-    `Circuit.circuitId` as circuit_id,
-    `Circuit.circuitName` as circuit_name,
+    Circuit.circuitId as circuit_id,
+    Circuit.circuitName as circuit_name,
     -- `Circuit.Location.lat` as lat,
     -- `Circuit.Location.long` as long,
-    `Circuit.Location.locality` as locality,
-    `Circuit.Location.country` as country
+    Circuit.Location.locality as locality,
+    Circuit.Location.country as country
     -- `FirstPractice.date` as first_practice_date,
     -- `FirstPractice.time` as first_practice_time,
     -- `SecondPractice.date` as second_practice_date,
@@ -22,4 +22,5 @@ SELECT
     -- `Sprint.time` as sprint_time,
     -- `SprintQualifying.date` as sprint_qualifying_date,
     -- `SprintQualifying.time` as sprint_qualifying_time
+
 FROM {{ source('bronze', 'races') }};

@@ -3,7 +3,8 @@ WITH exploded AS (
         season,
         round,
         explode(Results) AS result
-    FROM {{ source('bronze', 'results') }}
+    -- FROM {{ source('bronze', 'results') }}
+    FROM f1.bronze.results
 )
 
 SELECT

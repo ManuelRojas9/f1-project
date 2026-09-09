@@ -267,20 +267,6 @@ resources:
             catalog: f1
             source: WORKSPACE
           environment_key: dbt-default
-        - task_key: transform_season_to_silver
-          depends_on:
-            - task_key: load_seasons
-          dbt_task:
-            project_directory: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/dbt
-            commands:
-              - dbt deps
-              - dbt seed
-              - dbt run --select models/staging/stg_seasons.sql
-            schema: silver
-            warehouse_id: 22fe6bda0b174cfa
-            catalog: f1
-            source: WORKSPACE
-          environment_key: dbt-default
         - task_key: transform_sprints_to_silver
           depends_on:
             - task_key: load_sprints

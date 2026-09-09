@@ -10,5 +10,5 @@ sources:
       - name: laps
       - name: races
       - name: results
-      - name: seasons
       - name: sprint
+      - name: pitstops
