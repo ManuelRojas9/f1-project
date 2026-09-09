@@ -1,0 +1,12 @@
+bundle:
+  name: f1-project
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://dbc-66d4d025-28d2.cloud.databricks.com

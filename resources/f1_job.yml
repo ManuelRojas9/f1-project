@@ -1,0 +1,312 @@
+resources:
+  jobs:
+    f1:
+      name: f1
+      tasks:
+        - task_key: extract_constructors
+          spark_python_task:
+            python_file: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/f1_pipeline/extract/extract_file.py
+            parameters:
+              - --url
+              - https://api.jolpi.ca/ergast/f1/{{job.parameters.season}}/constructors.json
+              - --target-path
+              - constructors/season={{job.parameters.season}}.json
+          min_retry_interval_millis: 900000
+          disable_auto_optimization: true
+          environment_key: Default
+        - task_key: extract_drivers
+          spark_python_task:
+            python_file: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/f1_pipeline/extract/extract_file.py
+            parameters:
+              - --url
+              - https://api.jolpi.ca/ergast/f1/{{job.parameters.season}}/drivers.json
+              - --target-path
+              - drivers/season={{job.parameters.season}}.json
+          min_retry_interval_millis: 900000
+          disable_auto_optimization: true
+          environment_key: Default
+        - task_key: extract_races
+          spark_python_task:
+            python_file: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/f1_pipeline/extract/extract_file.py
+            parameters:
+              - --url
+              - https://api.jolpi.ca/ergast/f1/{{job.parameters.season}}/races.json
+              - --target-path
+              - races/season={{job.parameters.season}}.json
+          min_retry_interval_millis: 900000
+          disable_auto_optimization: true
+          environment_key: Default
+        - task_key: extract_laps
+          depends_on:
+            - task_key: extract_races
+          spark_python_task:
+            python_file: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/f1_pipeline/extract/extract_file_by_round.py
+            parameters:
+              - --season
+              - "{{job.parameters.season}}"
+              - --endpoint
+              - laps
+          min_retry_interval_millis: 900000
+          disable_auto_optimization: true
+          environment_key: Default
+        - task_key: extract_pitstops
+          depends_on:
+            - task_key: extract_races
+          spark_python_task:
+            python_file: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/f1_pipeline/extract/extract_file_by_round.py
+            parameters:
+              - --season
+              - "{{job.parameters.season}}"
+              - --endpoint
+              - pitstops
+          min_retry_interval_millis: 900000
+          disable_auto_optimization: true
+          environment_key: Default
+        - task_key: extract_results
+          spark_python_task:
+            python_file: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/f1_pipeline/extract/extract_file.py
+            parameters:
+              - --url
+              - https://api.jolpi.ca/ergast/f1/{{job.parameters.season}}/results.json
+              - --target-path
+              - results/season={{job.parameters.season}}.json
+          min_retry_interval_millis: 900000
+          disable_auto_optimization: true
+          environment_key: Default
+        - task_key: extract_seasons
+          spark_python_task:
+            python_file: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/f1_pipeline/extract/extract_file.py
+            parameters:
+              - --url
+              - https://api.jolpi.ca/ergast/f1/seasons.json
+              - --target-path
+              - seasons/seasons.json
+          min_retry_interval_millis: 900000
+          disable_auto_optimization: true
+          environment_key: Default
+        - task_key: extract_sprints
+          spark_python_task:
+            python_file: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/f1_pipeline/extract/extract_file.py
+            parameters:
+              - --url
+              - https://api.jolpi.ca/ergast/f1/{{job.parameters.season}}/sprint.json
+              - --target-path
+              - sprint/season={{job.parameters.season}}.json
+          min_retry_interval_millis: 900000
+          disable_auto_optimization: true
+          environment_key: Default
+        - task_key: load_constructors
+          depends_on:
+            - task_key: extract_constructors
+          spark_python_task:
+            python_file: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/f1_pipeline/load/load_bronze.py
+            parameters:
+              - --path
+              - /Volumes/f1/bronze/raw_files/constructors
+          min_retry_interval_millis: 900000
+          disable_auto_optimization: true
+          environment_key: Default
+        - task_key: load_drivers
+          depends_on:
+            - task_key: extract_drivers
+          spark_python_task:
+            python_file: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/f1_pipeline/load/load_bronze.py
+            parameters:
+              - --path
+              - /Volumes/f1/bronze/raw_files/drivers
+          min_retry_interval_millis: 900000
+          disable_auto_optimization: true
+          environment_key: Default
+        - task_key: load_laps
+          depends_on:
+            - task_key: extract_laps
+          spark_python_task:
+            python_file: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/f1_pipeline/load/load_bronze.py
+            parameters:
+              - --path
+              - /Volumes/f1/bronze/raw_files/laps/season={{job.parameters.season}}
+          min_retry_interval_millis: 900000
+          disable_auto_optimization: true
+          environment_key: Default
+        - task_key: load_pitstops
+          depends_on:
+            - task_key: extract_pitstops
+          spark_python_task:
+            python_file: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/f1_pipeline/load/load_bronze.py
+            parameters:
+              - --path
+              - /Volumes/f1/bronze/raw_files/pitstops/season={{job.parameters.season}}
+          min_retry_interval_millis: 900000
+          disable_auto_optimization: true
+          environment_key: Default
+        - task_key: load_races
+          depends_on:
+            - task_key: extract_races
+          spark_python_task:
+            python_file: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/f1_pipeline/load/load_bronze.py
+            parameters:
+              - --path
+              - /Volumes/f1/bronze/raw_files/races
+          min_retry_interval_millis: 900000
+          disable_auto_optimization: true
+          environment_key: Default
+        - task_key: load_results
+          depends_on:
+            - task_key: extract_results
+          spark_python_task:
+            python_file: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/f1_pipeline/load/load_bronze.py
+            parameters:
+              - --path
+              - /Volumes/f1/bronze/raw_files/results
+          min_retry_interval_millis: 900000
+          disable_auto_optimization: true
+          environment_key: Default
+        - task_key: load_seasons
+          depends_on:
+            - task_key: extract_seasons
+          spark_python_task:
+            python_file: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/f1_pipeline/load/load_bronze.py
+            parameters:
+              - --path
+              - /Volumes/f1/bronze/raw_files/seasons
+          min_retry_interval_millis: 900000
+          disable_auto_optimization: true
+          environment_key: Default
+        - task_key: load_sprints
+          depends_on:
+            - task_key: extract_sprints
+          spark_python_task:
+            python_file: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/f1_pipeline/load/load_bronze.py
+            parameters:
+              - --path
+              - /Volumes/f1/bronze/raw_files/sprint
+          min_retry_interval_millis: 900000
+          disable_auto_optimization: true
+          environment_key: Default
+        - task_key: transform_constructors_to_silver
+          depends_on:
+            - task_key: load_constructors
+          dbt_task:
+            project_directory: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/dbt
+            commands:
+              - dbt deps
+              - dbt seed
+              - dbt run --select models/staging/stg_constructors.sql
+            schema: silver
+            warehouse_id: 22fe6bda0b174cfa
+            catalog: f1
+            source: WORKSPACE
+          environment_key: dbt-default
+        - task_key: transform_drivers_to_silver
+          depends_on:
+            - task_key: load_drivers
+          dbt_task:
+            project_directory: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/dbt
+            commands:
+              - dbt deps
+              - dbt seed
+              - dbt run --select models/staging/stg_drivers.sql
+            schema: silver
+            warehouse_id: 22fe6bda0b174cfa
+            catalog: f1
+            source: WORKSPACE
+          environment_key: dbt-default
+        - task_key: transform_laps_to_silver
+          depends_on:
+            - task_key: load_laps
+          dbt_task:
+            project_directory: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/dbt
+            commands:
+              - dbt deps
+              - dbt seed
+              - dbt run --select models/staging/stg_laps.sql
+            schema: silver
+            warehouse_id: 22fe6bda0b174cfa
+            catalog: f1
+            source: WORKSPACE
+          environment_key: dbt-default
+        - task_key: transform_pitstops_to_silver
+          depends_on:
+            - task_key: load_pitstops
+          dbt_task:
+            project_directory: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/dbt
+            commands:
+              - dbt deps
+              - dbt seed
+              - dbt run --select models/staging/stg_pitstops.sql
+            schema: silver
+            warehouse_id: 22fe6bda0b174cfa
+            catalog: f1
+            source: WORKSPACE
+          environment_key: dbt-default
+        - task_key: transform_races_to_silver
+          depends_on:
+            - task_key: load_races
+          dbt_task:
+            project_directory: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/dbt
+            commands:
+              - dbt deps
+              - dbt seed
+              - dbt run --select models/staging/stg_races.sql
+            schema: silver
+            warehouse_id: 22fe6bda0b174cfa
+            catalog: f1
+            source: WORKSPACE
+          environment_key: dbt-default
+        - task_key: transform_results_to_silver
+          depends_on:
+            - task_key: load_results
+          dbt_task:
+            project_directory: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/dbt
+            commands:
+              - dbt deps
+              - dbt seed
+              - dbt run --select models/staging/stg_results.sql
+            schema: silver
+            warehouse_id: 22fe6bda0b174cfa
+            catalog: f1
+            source: WORKSPACE
+          environment_key: dbt-default
+        - task_key: transform_season_to_silver
+          depends_on:
+            - task_key: load_seasons
+          dbt_task:
+            project_directory: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/dbt
+            commands:
+              - dbt deps
+              - dbt seed
+              - dbt run --select models/staging/stg_seasons.sql
+            schema: silver
+            warehouse_id: 22fe6bda0b174cfa
+            catalog: f1
+            source: WORKSPACE
+          environment_key: dbt-default
+        - task_key: transform_sprints_to_silver
+          depends_on:
+            - task_key: load_sprints
+          dbt_task:
+            project_directory: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/dbt
+            commands:
+              - dbt deps
+              - dbt seed
+              - dbt run --select models/staging/stg_sprints.sql
+            schema: silver
+            warehouse_id: 22fe6bda0b174cfa
+            catalog: f1
+            source: WORKSPACE
+          environment_key: dbt-default
+      queue:
+        enabled: true
+      parameters:
+        - name: season
+          default: "2026"
+      environments:
+        - environment_key: Default
+          spec:
+            environment_version: "5"
+        - environment_key: dbt-default
+          spec:
+            dependencies:
+              - dbt-databricks>=1.0.0,<2.0.0
+            environment_version: "5"
+      performance_target: PERFORMANCE_OPTIMIZED

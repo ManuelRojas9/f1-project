@@ -3,7 +3,7 @@ import json
 import pandas as pd
 from databricks.sdk.runtime import spark
 
-from f1_pipeline.json_utils import normalize_records
+from f1_pipeline.json_utils import find_table_and_list
 
 def read_pandas(path):
     json_files = [f for f in os.listdir(path) if f.endswith(".json")]
@@ -13,7 +13,7 @@ def read_pandas(path):
         with open(f"{path}/{file_name}") as f:
             data = json.load(f)
 
-        df = normalize_records(data.get("MRData", data))
+        df = pd.DataFrame(find_table_and_list(data.get("MRData", data)))
         if not df.empty:
             dfs.append(df)
 

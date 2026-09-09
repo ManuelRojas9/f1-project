@@ -32,7 +32,17 @@ def _drill_to_records(data):
                 if found is not None:
                     return found
     return None
+    
+def load_to_delta_pure(path, mode="overwrite"):
+    df_spark = spark.read.option("multiLine", True).json(path)
 
+    parts = [p for p in path.rstrip("/").split("/") if p]
+    if "=" in parts[-1]:
+        table_name = parts[-2]
+    else:
+        table_name = parts[-1]
+
+    df_spark.write.format("delta").mode(mode).saveAsTable(f"f1.bronze.{table_name}")
 
 def normalize_records(data):
     """Encuentra la lista de registros y, si cada item trae otra lista anidada
