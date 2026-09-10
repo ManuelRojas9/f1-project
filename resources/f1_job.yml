@@ -281,6 +281,20 @@ resources:
             catalog: f1
             source: WORKSPACE
           environment_key: dbt-default
+        - task_key: transform_driver_standings_to_gold
+          depends_on:
+            - task_key: transform_results_to_silver
+          dbt_task:
+            project_directory: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/dbt
+            commands:
+              - dbt deps
+              - dbt seed
+              - dbt run --select models/marts/fct_driver_standings.sql
+            schema: gold
+            warehouse_id: 22fe6bda0b174cfa
+            catalog: f1
+            source: WORKSPACE
+          environment_key: dbt-default
       queue:
         enabled: true
       parameters:

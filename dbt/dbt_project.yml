@@ -18,5 +18,7 @@ models:
   f1_project:                        # << mismo nombre que "name:" arriba
     staging:
       +materialized: view            # transformaciones ligeras bronze -> silver
+      +schema: silver
     marts:
       +materialized: table           # tablas finales para análisis/reportes
+      +schema: gold
