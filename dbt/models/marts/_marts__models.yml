@@ -16,3 +16,18 @@ models:
       - name: total_points
         tests:
           - not_null
+  - name: fct_constructor_standings
+    description: "Standings de constructores por temporada, con desempate tipo FIA"
+    columns:
+      - name: season
+        tests:
+          - not_null
+      - name: constructor_id
+        tests:
+          - not_null
+      - name: championship_rank
+        tests:
+          - not_null
+      - name: total_points
+        tests:
+          - not_null

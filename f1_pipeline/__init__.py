@@ -1,1 +1,1 @@
-from f1_pipeline.json_utils import find_table_and_list, find_list_key
+from f1_pipeline.json_utils import find_table_and_list
