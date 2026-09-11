@@ -1,7 +1,8 @@
 resources:
   jobs:
-    f1:
-      name: f1
+    dev_manuelmrojas9_f1:
+      name: "[dev manuelmrojas9] f1"
+      max_concurrent_runs: 4
       tasks:
         - task_key: extract_constructors
           spark_python_task:
@@ -22,17 +23,6 @@ resources:
               - https://api.jolpi.ca/ergast/f1/{{job.parameters.season}}/drivers.json
               - --target-path
               - drivers/season={{job.parameters.season}}.json
-          min_retry_interval_millis: 900000
-          disable_auto_optimization: true
-          environment_key: Default
-        - task_key: extract_races
-          spark_python_task:
-            python_file: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/f1_pipeline/extract/extract_file.py
-            parameters:
-              - --url
-              - https://api.jolpi.ca/ergast/f1/{{job.parameters.season}}/races.json
-              - --target-path
-              - races/season={{job.parameters.season}}.json
           min_retry_interval_millis: 900000
           disable_auto_optimization: true
           environment_key: Default
@@ -59,6 +49,17 @@ resources:
               - "{{job.parameters.season}}"
               - --endpoint
               - pitstops
+          min_retry_interval_millis: 900000
+          disable_auto_optimization: true
+          environment_key: Default
+        - task_key: extract_races
+          spark_python_task:
+            python_file: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/f1_pipeline/extract/extract_file.py
+            parameters:
+              - --url
+              - https://api.jolpi.ca/ergast/f1/{{job.parameters.season}}/races.json
+              - --target-path
+              - races/season={{job.parameters.season}}.json
           min_retry_interval_millis: 900000
           disable_auto_optimization: true
           environment_key: Default
@@ -183,6 +184,20 @@ resources:
           min_retry_interval_millis: 900000
           disable_auto_optimization: true
           environment_key: Default
+        - task_key: transform_constructor_standings_to_gold
+          depends_on:
+            - task_key: transform_results_to_silver
+          dbt_task:
+            project_directory: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/dbt
+            commands:
+              - dbt deps
+              - dbt seed
+              - dbt run --select models/marts/fct_driver_constructor.sql
+            schema: gold
+            warehouse_id: 22fe6bda0b174cfa
+            catalog: f1
+            source: WORKSPACE
+          environment_key: dbt-default
         - task_key: transform_constructors_to_silver
           depends_on:
             - task_key: load_constructors
@@ -193,6 +208,20 @@ resources:
               - dbt seed
               - dbt run --select models/staging/stg_constructors.sql
             schema: silver
+            warehouse_id: 22fe6bda0b174cfa
+            catalog: f1
+            source: WORKSPACE
+          environment_key: dbt-default
+        - task_key: transform_driver_standings_to_gold
+          depends_on:
+            - task_key: transform_results_to_silver
+          dbt_task:
+            project_directory: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/dbt
+            commands:
+              - dbt deps
+              - dbt seed
+              - dbt run --select models/marts/fct_driver_standings.sql
+            schema: gold
             warehouse_id: 22fe6bda0b174cfa
             catalog: f1
             source: WORKSPACE
@@ -281,20 +310,29 @@ resources:
             catalog: f1
             source: WORKSPACE
           environment_key: dbt-default
-        - task_key: transform_driver_standings_to_gold
+        - task_key: run_all_tests
           depends_on:
+            - task_key: transform_constructors_to_silver
+            - task_key: transform_drivers_to_silver
+            - task_key: transform_laps_to_silver
+            - task_key: transform_pitstops_to_silver
+            - task_key: transform_races_to_silver
             - task_key: transform_results_to_silver
+            - task_key: transform_sprints_to_silver
+            - task_key: transform_driver_standings_to_gold
+            - task_key: transform_constructor_standings_to_gold
           dbt_task:
             project_directory: /Workspace/Users/manuelmrojas9@gmail.com/f1-project/dbt
             commands:
               - dbt deps
-              - dbt seed
-              - dbt run --select models/marts/fct_driver_standings.sql
+              - dbt test
             schema: gold
             warehouse_id: 22fe6bda0b174cfa
             catalog: f1
             source: WORKSPACE
           environment_key: dbt-default
+      tags:
+        dev: manuelmrojas9
       queue:
         enabled: true
       parameters:

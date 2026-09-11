@@ -3,7 +3,7 @@ WITH results as (
     UNION ALL
     SELECT season, round, grid, driver_id, constructor_id, points, "sprint" as race_format, position FROM {{ ref('stg_sprints') }}
 ),
- season_max_grid AS (
+season_max_grid AS (
     SELECT
         season,
         explode(sequence(1, max_grid)) AS position
@@ -15,14 +15,14 @@ WITH results as (
 ),
 
 driver_seasons AS (
-    SELECT DISTINCT season, driver_id
+    SELECT DISTINCT season, constructor_id
     FROM results
 ),
 
 grid AS (
     SELECT
         ds.season,
-        ds.driver_id,
+        ds.constructor_id,
         smg.position
     FROM driver_seasons ds
     JOIN season_max_grid smg
@@ -32,23 +32,23 @@ grid AS (
 driver_count AS (
     SELECT
         season,
-        driver_id,
+        constructor_id,
         position,
         COUNT(*) AS cnt
     FROM results
-    GROUP BY season, driver_id, position
+    GROUP BY season, constructor_id, position
 ),
 
 counts_filled AS (
     SELECT
         grid.season,
-        grid.driver_id,
+        grid.constructor_id,
         grid.position,
         COALESCE(driver_count.cnt, 0) AS cnt
     FROM grid
     LEFT JOIN driver_count
         ON grid.season = driver_count.season
-        AND grid.driver_id = driver_count.driver_id
+        AND grid.constructor_id = driver_count.constructor_id
         AND grid.position = driver_count.position
 ),
 
@@ -57,43 +57,43 @@ counts_filled AS (
 position_counts AS (
     SELECT
         season,
-        driver_id,
+        constructor_id,
         transform(
             sort_array(collect_list(struct(position, cnt))),
             x -> x.cnt
         ) AS position_counts
     FROM counts_filled
-    GROUP BY season, driver_id
+    GROUP BY season, constructor_id
 ),
 
 sum_points AS (
     SELECT
-        driver_id,
+        constructor_id,
         season,
         SUM(points) AS total_points
     FROM results
-    GROUP BY driver_id, season
+    GROUP BY constructor_id, season
 ),
 
 combined AS (
     SELECT
         sp.season,
-        sp.driver_id,
+        sp.constructor_id,
         sp.total_points,
         pc.position_counts
     FROM sum_points sp
     LEFT JOIN position_counts pc
         ON sp.season = pc.season
-        AND sp.driver_id = pc.driver_id
+        AND sp.constructor_id = pc.constructor_id
 )
 
 SELECT
     season,
-    driver_id,
+    constructor_id,
     total_points,
     ROW_NUMBER() OVER (
         PARTITION BY season
-        ORDER BY total_points DESC, position_counts DESC, driver_id ASC
+        ORDER BY total_points DESC, position_counts DESC, constructor_id ASC
     ) AS championship_rank
 FROM combined
 ORDER BY season, championship_rank

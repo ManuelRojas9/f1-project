@@ -1,0 +1,33 @@
+version: 2
+
+models:
+  - name: stg_drivers
+    columns:
+      - name: driver_id
+        tests:
+          - not_null
+          - unique
+
+  - name: stg_races
+    columns:
+      - name: season
+        tests:
+          - not_null
+      - name: round
+        tests:
+          - not_null
+
+  - name: stg_results
+    columns:
+      - name: driver_id
+        tests:
+          - not_null
+      - name: season
+        tests:
+          - not_null
+      - name: status
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Finished', 'Retired', 'Accident', 'Engine', 'Lapped', 'Did not start', 'Disqualified']
+                # ajusta según los valores reales que tengas

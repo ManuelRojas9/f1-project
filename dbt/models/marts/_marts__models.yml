@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: fct_driver_standings
+    description: "Standings de pilotos por temporada, con desempate tipo FIA"
+    columns:
+      - name: season
+        tests:
+          - not_null
+      - name: driver_id
+        tests:
+          - not_null
+      - name: championship_rank
+        tests:
+          - not_null
+      - name: total_points
+        tests:
+          - not_null
