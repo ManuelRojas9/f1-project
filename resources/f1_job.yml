@@ -192,7 +192,7 @@ resources:
             commands:
               - dbt deps
               - dbt seed
-              - dbt run --select models/marts/fct_driver_constructor.sql
+              - dbt run --select models/marts/fct_constructor_standings.sql
             schema: gold
             warehouse_id: 22fe6bda0b174cfa
             catalog: f1
