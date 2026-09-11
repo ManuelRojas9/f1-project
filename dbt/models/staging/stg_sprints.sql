@@ -4,7 +4,7 @@ WITH sprint_results_exploded (
     round,
     explode(SprintResults) as sprint_results
   FROM
-    f1.bronze.sprint
+    {{ source('bronze', 'sprint') }}
 )
 SELECT
   season,

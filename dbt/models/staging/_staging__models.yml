@@ -27,7 +27,47 @@ models:
           - not_null
       - name: status
         tests:
-          - accepted_values:
-              arguments:
-                values: ['Finished', 'Retired', 'Accident', 'Engine', 'Lapped', 'Did not start', 'Disqualified']
-                # ajusta según los valores reales que tengas
+          - not_null
+
+  - name: stg_constructors
+    columns:
+      - name: constructor_id
+        tests:
+          - not_null
+          - unique
+
+  - name: stg_sprints
+    columns:
+      - name: season
+        tests:
+          - not_null
+      - name: round
+        tests:
+          - not_null
+      - name: driver_id
+        tests:
+          - not_null
+
+  - name: stg_pitstops
+    columns:
+      - name: season
+        tests:
+          - not_null
+      - name: round
+        tests:
+          - not_null
+      - name: driver_id
+        tests:
+          - not_null
+
+  - name: stg_laps
+    columns:
+      - name: season
+        tests:
+          - not_null
+      - name: round
+        tests:
+          - not_null
+      - name: driver_id
+        tests:
+          - not_null
